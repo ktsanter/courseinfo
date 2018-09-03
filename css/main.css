@@ -86,3 +86,8 @@ body {
 	border-width: 1px;
 	border-radius: 6px;
 }
+
+img.ci-simpleborder {
+    width: 100%;
+    height: auto;
+}
