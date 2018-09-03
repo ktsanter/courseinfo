@@ -1,8 +1,9 @@
-.wl-colorscheme {
+.ci-colorscheme {
 	--ci-color1: #2d3436;
 	--ci-color2: #f8f8f8;
 	--ci-color3: #c8c8c8;
 	--ci-color4: #2f8d98;
+	--ci-color5: #ffffff;
 }
 
 body {
@@ -14,32 +15,74 @@ body {
 	margin-right: 12px;
 }
 
-.wl-notice {
+.ci-header {
+	color: var(--ci-color2);
+	background-color: var(--ci-color1);
+	border-color: var(--ci-color2);
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: bold;
+	padding-left: 4px;
+	margin-bottom: 4px;
+}
+
+.ci-title {
+	color: var(--ci-color5);
+	background-color: var(--ci-color4);
+	border-color: var(--ci-color5);
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 4px;
+}
+
+.ci-notice {
 	color: blue;
 	font-size: 14px;
 	font-style: italic;
 }
 
-.accordion {
+.ci-accordion {
     background-color: #eee;
     color: #444;
     cursor: pointer;
-    padding: 18px;
+    padding:4px;
     width: 100%;
-    border: none;
     text-align: left;
     outline: none;
-    font-size: 15px;
     transition: 0.4s;
+	
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 6px;
 }
 
-.active, .accordion:hover {
+.ci-active, .ci-accordion:hover {
     background-color: #ccc; 
 }
 
-.panel {
-    padding: 0 18px;
+.ci-panel {
+    padding: 12px 18px 12px 0px;
     display: none;
     background-color: white;
     overflow: hidden;
+}
+
+.ci-bblink {
+	color: var(--ci-color2);
+	background-color: var(--ci-color4);
+	border: 1px solid var(--ci-color2);
+	border-radius: 6px;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.ci-simpleborder {
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 6px;
 }

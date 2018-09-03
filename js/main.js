@@ -1,5 +1,6 @@
 //
-// TODO: change student/mentor to layoutType
+// TODO: Google web API deploy
+// TODO: styling
 //
 const app = function () {
 	const PAGE_TITLE = 'Course info'
@@ -40,6 +41,8 @@ const app = function () {
 		page.notice = document.getElementById('notice');
 		page.notice.classList.add('wl-notice');
 		
+		page.title = document.getElementById('title');
+		page.title.style.display = 'none';
 		page.contents = document.getElementById('contents');
 				
 		if (!_initializeSettings()) {
@@ -145,12 +148,14 @@ const app = function () {
 	// use settings.config to load HTML include files
 	//--------------------------------------------------------------------------------
 	function _renderCourseInfoMain() {
+		page.title.innerHTML = 'Expectations and FAQs for ' + settings.fulllayout.fullname;
+		page.title.style.display = 'block';
+
 		_renderCourseInfoSubsections(page.contents);
 	}
 	
 	function _renderCourseInfoSubsections(elemParent) {
 		var fulllayout = settings.fulllayout;
-		var fullname = fulllayout.fullname;
 		var layout = fulllayout.layout;
 		var layoutelement = layoutElementId;
 		var defaultinclude = defaultIncludeFile;
@@ -182,7 +187,7 @@ const app = function () {
 	}
 	
 	function addAccordionHandlers() {
-		var acc = document.getElementsByClassName("accordion");
+		var acc = document.getElementsByClassName("ci-accordion");
 		var i;
 
 		for (i = 0; i < acc.length; i++) {
@@ -191,7 +196,7 @@ const app = function () {
 
 				acc[i].addEventListener("click", function(evt) {
 					// toggle active state for this panel and set display accordingly
-					this.classList.toggle("active");
+					this.classList.toggle("ci-active");
 					
 					panel = this.nextElementSibling;
 					if (panel.style.display === "block") {
@@ -201,11 +206,11 @@ const app = function () {
 					}
 
 					// hide contents of any other open panels
-					var activePanels = document.getElementsByClassName("active");
+					var activePanels = document.getElementsByClassName("ci-active");
 					for (var j = 0; j < activePanels.length; j++) {
 						var activePanel = activePanels[j];
 						if (activePanel != this) {
-							activePanel.classList.remove("active");
+							activePanel.classList.remove("ci-active");
 							activePanel.nextElementSibling.style.display = "none";
 						}
 					}
