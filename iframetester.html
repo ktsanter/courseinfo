@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+	
+#iframe-coursegenerator {
+	width: 100%;
+	height: 100px;
+	border: 1px solid black;
+}
+</style>
+</head>
+
+<body>
+
+<iframe id="iframe-coursegenerator" src="index.html?coursekey=digital_literacy"></iframe>
+
+<script>
+window.addEventListener('message', function(e) {
+	var data = e.data.split('-');
+	var scroll_height = data[0];
+	var iframe_id = data[1];
+
+	if(iframe_id == 'CourseInfoGenerator') {
+		var elem = document.getElementById('iframe-coursegenerator');
+		var ht = parseInt(scroll_height);
+		elem.style.height = (ht + 10) + 'px'; 
+	}
+
+} , false);
+/*
+window.addEventListener('message', function(e) {
+console.log('e.data=' + e.data);
+var data = e.data.split('-'),
+           scroll_height = data[0],
+           iframe_id = data[1];
+
+if (iframe_id == 'CourseInfoGenerator') {
+	var elem = document.getElementById('iframe-coursegenerator');
+	var ht = parseInt(elem.style.height);
+    elem.style.height = (scroll_height + 10) + 'px'; 
+} , false);
+*/
+</script>
+
+</body>
+</html>

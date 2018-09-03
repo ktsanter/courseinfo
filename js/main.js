@@ -214,9 +214,13 @@ const app = function () {
 							activePanel.nextElementSibling.style.display = "none";
 						}
 					}
+					
+					_postHeightChangeMessage();
 				});
 			}
-		}		
+		}
+		
+		_postHeightChangeMessage();		
 	}
 		
 	//---------------------------------------
@@ -240,22 +244,6 @@ const app = function () {
 		if (page.courseselect.value == NO_COURSE) return;
 		_clearCourseInfo();
 		_generateCourseInfo();
-	}
-	
-	function _studentMentorChange(evt) {
-		settings.layouttype = evt.target.id
-
-		if (page.courseselect.value == NO_COURSE) return;
-		_clearWelcomeLetter();
-		_generateWelcomeLetter();
-	}
-	
-	function _termChange(evt) {
-		settings.term = evt.target.id
-
-		if (page.courseselect.value == NO_COURSE) return;
-		_clearWelcomeLetter();
-		_generateWelcomeLetter();
 	}
 	
 	//--------------------------------------------------------------
@@ -377,6 +365,35 @@ const app = function () {
 		callback();
 	}
 	
+	//-----------------------------------------------------------------------------------
+	// iframe responsive height - post message to parent (if in an iframe) to resizeBy
+	//-----------------------------------------------------------------------------------
+	function _postHeightChangeMessage() {
+		var msg = document.body.scrollHeight + '-' + 'CourseInfoGenerator';
+		console.log('posting to parent: ' + msg);
+		window.parent.postMessage(msg, "*");
+	}
+	/*------------------------------------------------------------
+	 * include this in the parent iframe (named 'iframe-coursegenerator')
+	 *------------------------------------------------------------*/
+	 /*
+<script>
+window.addEventListener('message', function(e) {
+	var data = e.data.split('-');
+	var scroll_height = data[0];
+	var iframe_id = data[1];
+
+	if(iframe_id == 'CourseInfoGenerator') {
+		var elem = document.getElementById('iframe-coursegenerator');
+		var ht = parseInt(scroll_height);
+		elem.style.height = (ht + 10) + 'px'; 
+	}
+
+} , false);
+</script>
+*/	
+//--------------------------------------------------------------------------------
+
 	return {
 		init: init
  	};
