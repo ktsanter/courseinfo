@@ -70,7 +70,7 @@ const app = function () {
 		settings.navmode = params.navmode;
 		settings.coursekey = params.coursekey;
 		
-		if (params.navode || params.coursekey != null) {
+		if (params.navmode || params.coursekey != null) {
 			result = true;
 		}
 		
