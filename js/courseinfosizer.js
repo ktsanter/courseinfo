@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style type="text/css">
-	
-#iframe-coursegenerator {
-	width: 100%;
-	height: 100px;
-	border: 1px solid black;
-}
-</style>
-</head>
 
-<body>
-
-<iframe id="iframe-coursegenerator" src="index.html?coursekey=digital_literacy"></iframe>
-
-<script>
 window.addEventListener('message', function(e) {
 	var data = e.data.split('-');
 	var scroll_height = data[0];
@@ -28,7 +11,3 @@ window.addEventListener('message', function(e) {
 	}
 
 } , false);
-</script>
-
-</body>
-</html>

@@ -1,10 +1,10 @@
 //
 // TODO: Google web API deploy
-// TODO: styling
+// TODO: tool to generate embed code including resize script
+// TODO: see if courseinfosizer.js can be loaded from GitHub
 //
 const app = function () {
 	const PAGE_TITLE = 'Course info'
-	const PAGE_VERSION = 'v0.1';
 		
 	const API_BASE = 'https://script.google.com/macros/s/AKfycbwuO-prQVmE_8HetNfg67dqK4Jie7eetp_8j4Bo5HcHGASf_5GN/exec';
 	const API_KEY = 'MVwelcomemessageAPI';
@@ -370,14 +370,19 @@ const app = function () {
 	//-----------------------------------------------------------------------------------
 	function _postHeightChangeMessage() {
 		var msg = document.body.scrollHeight + '-' + 'CourseInfoGenerator';
-		console.log('posting to parent: ' + msg);
+		//console.log('posting to parent: ' + msg);
 		window.parent.postMessage(msg, "*");
 	}
 	/*------------------------------------------------------------
-	 * include this in the parent iframe (named 'iframe-coursegenerator')
+	 * sample embed code for parent iframe
 	 *------------------------------------------------------------*/
 	 /*
-<script>
+
+<script type="text/javascript" src="https://drive.google.com/uc?id=1lE_MPv0lYEX6mFaTPFmJ7S83YRRbLSQo"></script>
+<iframe id="iframe-coursegenerator" width="100%" height="100" src="https://ktsanter.github.io/courseinfo/?coursekey=digital_literacy"></iframe>
+
+** Note this script is stored in Google Drive as 'courseinfosizer.js' and should be:
+
 window.addEventListener('message', function(e) {
 	var data = e.data.split('-');
 	var scroll_height = data[0];
@@ -390,8 +395,8 @@ window.addEventListener('message', function(e) {
 	}
 
 } , false);
-</script>
-*/	
+*/
+	
 //--------------------------------------------------------------------------------
 
 	return {
