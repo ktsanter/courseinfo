@@ -23,13 +23,20 @@ const app = function () {
 
 	const defaultIncludeFile = {
 		"generalfaq": "generalfaq.html",
-		"specificfaq": "specificfaq.html"
+		"specificfaq": "specificfaq_none.html"
 	};
 	
 	//---------------------------------------
 	// get things going
 	//----------------------------------------
 	function init () {
+		page.header = document.getElementById('header');
+		page.header.toolname = document.getElementById('toolname');
+		page.header.courses = document.getElementById('courses');
+		page.header.controls = document.getElementById('controls');
+		page.header.style.display = 'none'; 
+		page.header.style.visibility = 'hidden';
+
 		page.notice = document.getElementById('notice');
 		page.notice.classList.add('wl-notice');
 		
@@ -38,25 +45,34 @@ const app = function () {
 		if (!_initializeSettings()) {
 			_setNotice('Failed to generate course info - invalid parameters');
 		} else {
-			_generateCourseInfo();
+			if (settings.navmode) {
+				_getCourseList(_initHeader);
+				
+			} else {
+				_generateCourseInfo();
+			}
 		}
 	}
 	
 	//-------------------------------------------------------------------------------------
 	// query params:
+	//		navmode: displays drop-down list for all courses (optional)
+	//		coursekey: course for which to display info (required if not navmode)
 	//-------------------------------------------------------------------------------------
 	function _initializeSettings() {
 		var result = false;
-
 		var params = {};
 
-		settings.coursekey = 'javascript';
-			
 		var urlParams = new URLSearchParams(window.location.search);
-//		params.navmode = urlParams.has('navmode');
-//		params.coursekey = urlParams.has('coursekey') ? urlParams.get('coursekey') : null;
+		params.navmode = urlParams.has('navmode');
+		params.coursekey = urlParams.has('coursekey') ? urlParams.get('coursekey') : null;
 
-		result = true;
+		settings.navmode = params.navmode;
+		settings.coursekey = params.coursekey;
+		
+		if (params.navode || params.coursekey != null) {
+			result = true;
+		}
 		
 		return result;
 	}
@@ -70,12 +86,8 @@ const app = function () {
 		page.header.toolname.innerHTML = PAGE_TITLE;
 		
 		var elemCourseSelect = _createCourseSelect();
-		var elemLayout = _createLayoutChoice();
-		var elemTerm = _createTermChoice();
-			
+		
 		page.header.courses.appendChild(elemCourseSelect);
-		page.header.controls.appendChild(elemLayout);
-		page.header.controls.appendChild(elemTerm);
 		
 		page.header.style.display = 'block';
 		page.header.style.visibility = 'visible';
@@ -104,70 +116,7 @@ const app = function () {
 		
 		return elemCourseSelect;
 	}
-		
-	function _createLayoutChoice() {
-		var layoutChoices = ['student', 'mentor'];
-		var elementName = 'student_mentor';
-		var handler = _studentMentorChange;
-		var className = 'wl-radio';
-		
-		var elemWrapper = document.createElement('span');
-		elemWrapper.classList.add('container');
-		
-		for (var i = 0; i < layoutChoices.length; i++) {
-			var choice = layoutChoices[i];
-			
-			var elemChoice = document.createElement('input');
-			elemChoice.id = choice;
-			elemChoice.type = 'radio';
-			elemChoice.name = elementName;
-			if (i == 0) elemChoice.checked = true;
-			elemChoice.addEventListener('change', handler, false);
-			
-			var elemLabel = document.createElement('label');
-			elemLabel.htmlFor = choice;
-			elemLabel.innerHTML = choice;
-			elemLabel.classList.add(className);
-			
-			elemWrapper.appendChild(elemChoice);
-			elemWrapper.appendChild(elemLabel);
-		}
-		
-		return elemWrapper;
-	}
-	
-		
-	function _createTermChoice() {
-		var layoutChoices = ['s1', 's2', 't1', 't2', 't3', 'summer', 'essentials', 'open'];
-		var elementName = 'term';
-		var handler = _termChange;
-		var className = 'wl-radio';
-		
-		var elemWrapper = document.createElement('span');
-		elemWrapper.classList.add('container');
-		
-		for (var i = 0; i < layoutChoices.length; i++) {
-			var choice = layoutChoices[i];
-			
-			var elemChoice = document.createElement('input');
-			elemChoice.id = choice;
-			elemChoice.type = 'radio';
-			elemChoice.name = elementName;
-			if (i == 0) elemChoice.checked = true;
-			elemChoice.addEventListener('change', handler, false);
-			
-			var elemLabel = document.createElement('label');
-			elemLabel.htmlFor = choice;
-			elemLabel.innerHTML = choice;
-			elemLabel.classList.add(className);
-			
-			elemWrapper.appendChild(elemChoice);
-			elemWrapper.appendChild(elemLabel);
-		}
-		
-		return elemWrapper;
-	}
-		
+				
 	function _makeButton(id, className, label, title, listener) {
 		var btn = document.createElement('button');
 		btn.id = id;
@@ -284,8 +233,8 @@ const app = function () {
 		settings.coursekey = evt.target.value;
 
 		if (page.courseselect.value == NO_COURSE) return;
-		_clearWelcomeLetter();
-		_generateWelcomeLetter();
+		_clearCourseInfo();
+		_generateCourseInfo();
 	}
 	
 	function _studentMentorChange(evt) {
@@ -367,14 +316,59 @@ const app = function () {
 			*/
 			
 		_setNotice('');
-		settings.fulllayout = {
-			"coursekey": "javascript",
-			"fullname": "Advanced Web Design: JavaScript",
-			"layout": {
-				"generalfaq": "USE_DEFAULT",
-				"specificfaq": "specificfaq_javascript.html"
+		var fakesettings = {
+			"game_design": {
+				"coursekey": "game_design",
+				"fullname": "Advanced Programming: Game Design & Animation",
+				"layout": {
+					"generalfaq": "USE_DEFAULT",
+					"specificfaq": "USE_DEFAULT"
+				}
+			},
+			"javascript": {
+				"coursekey": "javascript",
+				"fullname": "Advanced Web Design: JavaScript",
+				"layout": {
+					"generalfaq": "USE_DEFAULT",
+					"specificfaq": "specificfaq_javascript.html"
+				}
+			},
+			"apcsp1": {
+				"coursekey": "apcsp1",
+				"fullname": "AP Computer Science Principles (semester 1)",
+				"layout": {
+					"generalfaq": "USE_DEFAULT",
+					"specificfaq": "specificfaq_apcsp1.html"
+				}
+			},
+			"html_css": {
+				"coursekey": "html_css",
+				"fullname": "Basic Web Design: HTML & CSS",
+				"layout": {
+					"generalfaq": "USE_DEFAULT",
+					"specificfaq": "specificfaq_html_css.html"
+				}
+			},
+			"digital_literacy": {
+				"coursekey": "digital_literacy",
+				"fullname": "Digital Literacy & Programming",
+				"layout": {
+					"generalfaq": "USE_DEFAULT",
+					"specificfaq": "specificfaq_digital_literacy.html"
+				}
+			},
+			"fpa": {
+				"coursekey": "fpa",
+				"fullname": "Foundations of Programming A",
+				"layout": {
+					"generalfaq": "USE_DEFAULT",
+					"specificfaq": "specificfaq_fpa.html"
+				}
 			}
 		};
+		
+		settings.fulllayout = fakesettings[settings.coursekey];
+
 		callback();
 	}
 	
