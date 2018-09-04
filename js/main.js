@@ -1,5 +1,4 @@
 //
-// TODO: Google web API deploy
 // TODO: tool to generate embed code including resize script
 // TODO: see if courseinfosizer.js can be loaded from GitHub
 // TODO: ask Noah about domain param for postMessage
@@ -7,14 +6,15 @@
 const app = function () {
 	const PAGE_TITLE = 'Course info'
 		
-	const API_BASE = 'https://script.google.com/macros/s/AKfycbwuO-prQVmE_8HetNfg67dqK4Jie7eetp_8j4Bo5HcHGASf_5GN/exec';
-	const API_KEY = 'MVwelcomemessageAPI';
+	const API_BASE = 'https://script.google.com/a/mivu.org/macros/s/AKfycbzkURCG12YKnF1NTIYi1iOdGlG5YoAD5H-BgH85Bw/exec';
+	const API_KEY = 'MVcourseinfoAPI';
 	
 	const NO_COURSE = 'NO_COURSE';
 	const USE_DEFAULT = 'USE_DEFAULT';
 	
 	const page = {};
 	const settings = {
+		"coursekey": NO_COURSE,
 		"include": "./include/",
 	};
 
@@ -40,11 +40,14 @@ const app = function () {
 		page.header.style.visibility = 'hidden';
 
 		page.notice = document.getElementById('notice');
-		page.notice.classList.add('wl-notice');
+		page.notice.classList.add('ci-notice');
 		
 		page.title = document.getElementById('title');
 		page.title.style.display = 'none';
 		page.contents = document.getElementById('contents');
+		
+		page.textforclipboard = document.getElementById('text_for_clipboard');
+		page.textforclipboard.style.display = 'none';
 				
 		if (!_initializeSettings()) {
 			_setNotice('Failed to generate course info - invalid parameters');
@@ -90,8 +93,10 @@ const app = function () {
 		page.header.toolname.innerHTML = PAGE_TITLE;
 		
 		var elemCourseSelect = _createCourseSelect();
+		var elemEmbedControl = _createEmbedControl();
 		
 		page.header.courses.appendChild(elemCourseSelect);
+		page.header.courses.appendChild(elemEmbedControl);
 		
 		page.header.style.display = 'block';
 		page.header.style.visibility = 'visible';
@@ -120,13 +125,21 @@ const app = function () {
 		
 		return elemCourseSelect;
 	}
+	
+	function _createEmbedControl() {
+		var elemWrapper = document.createElement('span');
+		
+		elemWrapper.appendChild(_makeButton('btnEmbed', 'ci-control', 'embed', 'copy embed code to clipboard', _handleEmbedButton));
+		
+		return elemWrapper;
+	}
 				
-	function _makeButton(id, className, label, title, listener) {
+	function _makeButton(id, className, label, tooltip, listener) {
 		var btn = document.createElement('button');
 		btn.id = id;
 		btn.classList.add(className);
 		btn.innerHTML = label;
-		btn.title = title;
+		btn.title = tooltip;
 		btn.addEventListener('click', listener, false);
 		return btn;
 	}
@@ -250,12 +263,11 @@ const app = function () {
 	//--------------------------------------------------------------
 	// build URL for use with Google sheet web API
 	//--------------------------------------------------------------
-		function _buildApiUrl (datasetname, coursekey, layouttype) {
+		function _buildApiUrl (datasetname, coursekey) {
 		let url = API_BASE;
 		url += '?key=' + API_KEY;
 		url += datasetname && datasetname !== null ? '&dataset=' + datasetname : '';
 		url += coursekey && coursekey !== null ? '&coursekey=' + coursekey : '';
-		url += layouttype && layouttype !== null ? '&layouttype=' + layouttype : '';
 		//console.log('buildApiUrl: url=' + url);
 		
 		return url;
@@ -290,8 +302,8 @@ const app = function () {
 	//--------------------------------------------------------------
 	function _getCourseInfoLayout (callback) {
 		_setNotice('loading layout for course...');
-		/*
-		fetch(_buildApiUrl('layout', settings.coursekey, settings.layouttype))
+		
+		fetch(_buildApiUrl('layout', settings.coursekey))
 			.then((response) => response.json())
 			.then((json) => {
 				//console.log('json.status=' + json.status);
@@ -307,64 +319,7 @@ const app = function () {
 				_setNotice('Unexpected error loading layout');
 				console.log(error);
 			})
-			*/
-			
-		_setNotice('');
-		var fakesettings = {
-			"game_design": {
-				"coursekey": "game_design",
-				"fullname": "Advanced Programming: Game Design & Animation",
-				"layout": {
-					"generalfaq": "USE_DEFAULT",
-					"specificfaq": "USE_DEFAULT"
-				}
-			},
-			"javascript": {
-				"coursekey": "javascript",
-				"fullname": "Advanced Web Design: JavaScript",
-				"layout": {
-					"generalfaq": "USE_DEFAULT",
-					"specificfaq": "specificfaq_javascript.html"
-				}
-			},
-			"apcsp1": {
-				"coursekey": "apcsp1",
-				"fullname": "AP Computer Science Principles (semester 1)",
-				"layout": {
-					"generalfaq": "USE_DEFAULT",
-					"specificfaq": "specificfaq_apcsp1.html"
-				}
-			},
-			"html_css": {
-				"coursekey": "html_css",
-				"fullname": "Basic Web Design: HTML & CSS",
-				"layout": {
-					"generalfaq": "USE_DEFAULT",
-					"specificfaq": "specificfaq_html_css.html"
-				}
-			},
-			"digital_literacy": {
-				"coursekey": "digital_literacy",
-				"fullname": "Digital Literacy & Programming",
-				"layout": {
-					"generalfaq": "USE_DEFAULT",
-					"specificfaq": "specificfaq_digital_literacy.html"
-				}
-			},
-			"fpa": {
-				"coursekey": "fpa",
-				"fullname": "Foundations of Programming A",
-				"layout": {
-					"generalfaq": "USE_DEFAULT",
-					"specificfaq": "specificfaq_fpa.html"
-				}
-			}
-		};
-		
-		settings.fulllayout = fakesettings[settings.coursekey];
-
-		callback();
-	}
+		}
 	
 	//-----------------------------------------------------------------------------------
 	// iframe responsive height - post message to parent (if in an iframe) to resizeBy
@@ -374,32 +329,40 @@ const app = function () {
 		//console.log('posting to parent: ' + msg);
 		window.parent.postMessage(msg, "*");
 	}
-	/*------------------------------------------------------------
-	 * sample embed code for parent iframe
-	 *------------------------------------------------------------*/
-	 /*
 
-<script type="text/javascript" src="https://drive.google.com/uc?id=1lE_MPv0lYEX6mFaTPFmJ7S83YRRbLSQo"></script>
-<iframe id="iframe-coursegenerator" width="100%" height="100" src="https://ktsanter.github.io/courseinfo/?coursekey=digital_literacy"></iframe>
-
-** Note this script is stored in Google Drive as 'courseinfosizer.js' and should be:
-
-window.addEventListener('message', function(e) {
-	var data = e.data.split('-');
-	var scroll_height = data[0];
-	var iframe_id = data[1];
-
-	if(iframe_id == 'CourseInfoGenerator') {
-		var elem = document.getElementById('iframe-coursegenerator');
-		var ht = parseInt(scroll_height);
-		elem.style.height = (ht + 10) + 'px'; 
+    //------------------------------------------------------------------------------------------
+    // create embed code and copy to clipboard
+    //------------------------------------------------------------------------------------------
+	function _handleEmbedButton(evt) {
+		if (page.courseselect.value == NO_COURSE) return;
+		
+		_copyEmbedCodeToClipboard();
 	}
-
-} , false);
-*/
 	
-//--------------------------------------------------------------------------------
+	function _copyEmbedCodeToClipboard() {
+		_setNotice('');
+				
+		var clipboardElement = page.textforclipboard;
+		clipboardElement.value = _createEmbedCode();
+		clipboardElement.style.display = 'block';
+		clipboardElement.select();
+		document.execCommand("Copy");
+		clipboardElement.selectionEnd = clipboardElement.selectionStart;
+		page.textforclipboard.style.display = 'none';
 
+		_setNotice(settings.coursekey + ' embed code copied to clipboard');
+	}
+	
+	function _createEmbedCode() {
+		// note the javascript link is to courseinfosizer.js in Google Drive
+		var embedCode = '' 
+			+ '<script type="text/javascript" src="https://drive.google.com/uc?id=1lE_MPv0lYEX6mFaTPFmJ7S83YRRbLSQo"></script>'
+			+ '<iframe id="iframe-coursegenerator" width="100%" height="100" '
+			+ 'src="https://ktsanter.github.io/courseinfo/?coursekey=' + settings.coursekey + '"></iframe>';
+
+		return embedCode;
+	}
+	
 	return {
 		init: init
  	};
