@@ -2,6 +2,7 @@
 // TODO: Google web API deploy
 // TODO: tool to generate embed code including resize script
 // TODO: see if courseinfosizer.js can be loaded from GitHub
+// TODO: ask Noah about domain param for postMessage
 //
 const app = function () {
 	const PAGE_TITLE = 'Course info'
